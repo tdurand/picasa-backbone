@@ -4,8 +4,8 @@
 	<title>Backbone Picasa Web Album Viewer</title>
 	<!-- Date: 2011-06-02 -->
 	<script type="text/javascript" src="libs/underscore-min.js" charset="utf-8"></script>
-	<script type="text/javascript" src="libs/backbone-min.js" charset="utf-8" ></script>
 	<script type="text/javascript" src="libs/jquery-1.4.4.min.js" charset="utf-8" ></script>
+	<script type="text/javascript" src="libs/backbone-min.js" charset="utf-8" ></script>	
 	</head>
 <body>
     
@@ -13,7 +13,35 @@
         
     </div>
     
+    <ul id="album"></ul>
+    
     <script type="text/javascript" charset="utf-8">
+    
+        var Album = Backbone.Model.extend({
+            url:function() {
+                return "http://picasaweb.google.com/data/feed/api/user/tibo.durand/albumid/5613631967148150081?authkey=Gv1sRgCOaugo_Wld-S6QE&alt=json&callback=?";
+            }
+        });
+        
+        var AlbumList = Backbone.Collection.extend({
+            model: Album,
+        });
+        
+        var albums=new AlbumList();
+        albums.add({
+            id:5613631967148150081
+        });
+        
+        var album = new Album();
+        
+        album.fetch();
+        
+        album.bind("change", function() {
+           $("#main").text(JSON.stringify(album));
+           $("#album").append("<img src='"+album.get("feed").entry[0].content.src+"' />")
+           
+        });
+        
         
     </script>
 
