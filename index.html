@@ -9,19 +9,38 @@
     </head>
 
     <script id="album" type="text/html">
-        <ul>
+        <ul class="photo-list">
         {{#feed}}
         
             {{#entry}}
             <li>
-                {{#content}}
-                    <img src="{{src}}" />
-                {{/content}}
+                {{#media$group}}
+                    {{#media$thumbnail}}
+                        <img src="{{url}}" />
+                    {{/media$thumbnail}}
+                {{/media$group}}
             </li>
             {{/entry}}
         {{/feed}}
         </ul>
     </script>
+    
+    <style>
+    body {
+        background-color:black;
+    }
+    ul.photo-list {
+        text-align:justify;
+    }
+    ul.photo-list li {
+        display:inline-block;
+        vertical-align:middle;
+        margin:1em;
+    }
+    ul.photo-list li img {
+        border:1px solid grey;
+    }
+    </style>
 <body>
     
     
@@ -37,6 +56,16 @@
         var Album = Backbone.Model.extend({
             url:function() {
                 return "http://picasaweb.google.com/data/feed/api/user/tibo.durand/albumid/5628148576955569809?authkey=Gv1sRgCO-Pmd3GwKLgeA&alt=json&callback=?";
+            },
+            parse : function(response) {
+                var thumbnailTemp;
+                _.each(response.feed.entry,function(photo) {
+                    thumbnailTemp=_.last(photo.media$group.media$thumbnail)
+                    photo.media$group.media$thumbnail=_.select(photo.media$group.media$thumbnail,function(thumbnail) {
+                        return (thumbnail==thumbnailTemp);
+                    });
+                });
+                return response;
             }
         });
         
