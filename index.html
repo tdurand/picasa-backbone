@@ -25,6 +25,10 @@
         </ul>
     </script>
     
+    <script id="albumList" type="text/html">
+        <p></p>
+    </script>
+    
     <style>
     body {
         background-color:black;
@@ -54,8 +58,17 @@
         
         
         var Album = Backbone.Model.extend({
+            view : null,
+            
+            initialize : function() {
+                this.fetch();
+                this.bind("change", function() {
+                    this.view=new AlbumView({model : this});
+                    this.view.render();
+                });
+            },
             url:function() {
-                return "http://picasaweb.google.com/data/feed/api/user/tibo.durand/albumid/5628148576955569809?authkey=Gv1sRgCO-Pmd3GwKLgeA&alt=json&callback=?";
+                return "http://picasaweb.google.com/data/feed/api/user/"+this.attributes.user+"/albumid/"+this.attributes.id+"?authkey="+this.attributes.authkey+"&alt=json&callback=?";
             },
             parse : function(response) {
                 var thumbnailTemp;
@@ -66,7 +79,7 @@
                     });
                 });
                 return response;
-            }
+            },
         });
         
         var AlbumView = Backbone.View.extend({
@@ -77,18 +90,37 @@
             }
         });
         
-        var album = new Album();
+        var AlbumList = Backbone.Collection.extend({
+            model : Album,
+        })
         
-        album.fetch();
+        var AlbumListView = Backbone.View.extend({
+            el : $("body"),
+            initialize : function() {
+                this.add(new Album({id:"5628148576955569809",authkey:"Gv1sRgCO-Pmd3GwKLgeA",user:"tibo.durand"}));
+            },
+            render: function() {
+                this.el.append(ich.albumList(this.model.toJSON()));
+                return this;
+            }
+            
+        }); 
         
-        var albumView = new AlbumView({model : album})
-        
-        
-        album.bind("change", function() {
-           albumView.model=album;
-           albumView.render();
+        var Gallery = Backbone.Router.extend({
+            routes : {
+                "":             "index",
+                "album/:id":    "album"
+            },
+            
+            index : function() {
+                
+            },
+            
+            album : function(id) {
+                
+            }
         });
         
-        
+        var album=new Album({id:"5628148576955569809",authkey:"Gv1sRgCO-Pmd3GwKLgeA",user:"tibo.durand"});
     </script>
 </html>
