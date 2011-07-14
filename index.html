@@ -1,49 +1,65 @@
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Backbone Picasa Web Album Viewer</title>
-	<!-- Date: 2011-06-02 -->
-	<script type="text/javascript" src="libs/underscore-min.js" charset="utf-8"></script>
-	<script type="text/javascript" src="libs/jquery-1.4.4.min.js" charset="utf-8" ></script>
-	<script type="text/javascript" src="libs/backbone-min.js" charset="utf-8" ></script>	
-	</head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Backbone Picasa Web Album Viewer</title>
+    <script type="text/javascript" src="libs/underscore-min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="libs/icanhaz.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="libs/backbone-min.js" charset="utf-8" ></script>
+    </head>
+
+    <script id="album" type="text/html">
+        <ul>
+        {{#feed}}
+        
+            {{#entry}}
+            <li>
+                {{#content}}
+                    <img src="{{src}}" />
+                {{/content}}
+            </li>
+            {{/entry}}
+        {{/feed}}
+        </ul>
+    </script>
 <body>
     
-    <div id="main">
-        
-    </div>
     
-    <ul id="album"></ul>
     
+
+</body>
     <script type="text/javascript" charset="utf-8">
     
+        //ICanhaz stuff
+        ich.grabTemplates();
+        
+        
         var Album = Backbone.Model.extend({
             url:function() {
-                return "http://picasaweb.google.com/data/feed/api/user/tibo.durand/albumid/5613631967148150081?authkey=Gv1sRgCOaugo_Wld-S6QE&alt=json&callback=?";
+                return "http://picasaweb.google.com/data/feed/api/user/tibo.durand/albumid/5628148576955569809?authkey=Gv1sRgCO-Pmd3GwKLgeA&alt=json&callback=?";
             }
         });
         
-        var AlbumList = Backbone.Collection.extend({
-            model: Album,
-        });
-        
-        var albums=new AlbumList();
-        albums.add({
-            id:5613631967148150081
+        var AlbumView = Backbone.View.extend({
+            el : $("body"),
+            render: function() {
+                this.el.append(ich.album(this.model.toJSON()));
+                return this;
+            }
         });
         
         var album = new Album();
         
         album.fetch();
         
+        var albumView = new AlbumView({model : album})
+        
+        
         album.bind("change", function() {
-           $("#main").text(JSON.stringify(album));
-           $("#album").append("<img src='"+album.get("feed").entry[0].content.src+"' />")
-           
+           albumView.model=album;
+           albumView.render();
         });
         
         
     </script>
-
-</body>
 </html>
